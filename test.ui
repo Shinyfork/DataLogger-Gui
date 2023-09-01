@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="tk.Toplevel" id="MainFrame" named="True">
+    <property name="geometry">1024x768</property>
+    <property name="height">200</property>
+    <property name="title" translatable="yes">Data Logger</property>
+    <property name="width">200</property>
+    <child>
+      <object class="ttk.Frame" id="frame6">
+        <property name="height">20</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="fill">x</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="ttk.Button" id="ID_Button_Start" named="True">
+            <property name="text" translatable="yes">Start</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="on_start_button" add="" />
+            <layout manager="pack">
+              <property name="side">left</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="ID_Button_Stop" named="True">
+            <property name="text" translatable="yes">Stop</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="on_stop_button" add="" />
+            <layout manager="pack">
+              <property name="side">left</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="ID_Button_Search" named="True">
+            <property name="text" translatable="yes">Search</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="on_search_button" add="" />
+            <layout manager="pack">
+              <property name="side">left</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="ID_Button_Close" named="True">
+            <property name="text" translatable="yes">Close</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="on_button_click_close" add="" />
+            <layout manager="pack">
+              <property name="side">right</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="id_label" named="True">
+            <property name="font">{MS} 20 {bold}</property>
+            <property name="text" translatable="yes">Data Logger V1</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="pygubu.builder.widgets.scrolledframe" id="ID_SCROLL" named="True">
+        <property name="scrolltype">vertical</property>
+        <property name="usemousewheel">true</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="ttk.Frame" id="ID_INNER_SCROLL" named="True">
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Text" id="ID_Bottom_Text" named="True">
+        <property name="height">1</property>
+        <property name="width">50</property>
+        <layout manager="pack">
+          <property name="fill">x</property>
+          <property name="side">bottom</property>
+        </layout>
+      </object>
+    </child>
+  </object>
+</interface>

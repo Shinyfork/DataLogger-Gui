@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="ttk.Frame" id="ID_DATALOGGER_FRAME" named="True">
+    <property name="height">200</property>
+    <property name="padding">2</property>
+    <property name="relief">ridge</property>
+    <property name="width">200</property>
+    <layout manager="pack">
+      <property name="fill">x</property>
+      <property name="side">top</property>
+    </layout>
+    <child>
+      <object class="ttk.Frame" id="frame10">
+        <property name="height">200</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="side">left</property>
+        </layout>
+        <child>
+          <object class="ttk.Label" id="ID_DATALOGER_HEADER" named="True">
+            <layout manager="pack">
+              <property name="anchor">n</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="ID_Combo_1" named="True">
+            <bind sequence="&lt;&lt;ComboboxSelected&gt;&gt;" handler="on_port_selected" add="" />
+            <layout manager="pack">
+              <property name="anchor">n</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="ID_LABEL_PORT" named="True">
+            <property name="text" translatable="yes">COM</property>
+            <layout manager="pack">
+              <property name="anchor">n</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="frame1">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="frame13">
+        <property name="height">200</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">x</property>
+          <property name="side">right</property>
+        </layout>
+        <child>
+          <object class="tk.Canvas" id="ID_Plot_1" named="True">
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">x</property>
+              <property name="side">right</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
