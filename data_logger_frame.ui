@@ -17,9 +17,11 @@
           <property name="side">left</property>
         </layout>
         <child>
-          <object class="ttk.Label" id="ID_DATALOGER_HEADER" named="True">
+          <object class="ttk.Entry" id="ID_ENTRY" named="True">
+            <property name="font">{@Yu Gothic UI} 12 {bold}</property>
+            <property name="text" translatable="yes">enter a label here..</property>
             <layout manager="pack">
-              <property name="anchor">n</property>
+              <property name="pady">10</property>
               <property name="side">top</property>
             </layout>
           </object>
@@ -51,6 +53,14 @@
             </layout>
           </object>
         </child>
+        <child>
+          <object class="ttk.Button" id="ID_Button_Close_Window" named="True">
+            <property name="text" translatable="yes">close logger window</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
       </object>
     </child>
     <child>
@@ -60,6 +70,7 @@
         <layout manager="pack">
           <property name="expand">true</property>
           <property name="fill">x</property>
+          <property name="ipadx">5</property>
           <property name="side">right</property>
         </layout>
         <child>
