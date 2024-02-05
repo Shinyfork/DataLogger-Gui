@@ -57,7 +57,10 @@ class DataLoggerFrameWidget(ttk.Frame):
 
         self.points = []
         self.x = 0
-
+        bg_color_name = self.cget('bg')
+        bg_rgb = self.winfo_rgb(bg_color_name)
+        bg_hex = f"#{int(bg_rgb[0] / 255):02X}{int(bg_rgb[1] / 255):02X}{int(bg_rgb[2] / 255):02X}"
+        self.plot_fig.patch.set_facecolor(bg_hex)
         self.populate_com_ports()
         self.schedule_serial_read()
         builder.connect_callbacks(self)
