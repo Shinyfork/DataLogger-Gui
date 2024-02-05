@@ -3,7 +3,7 @@
   <object class="tk.Toplevel" id="MainFrame" named="True">
     <property name="geometry">1280x720</property>
     <property name="height">200</property>
-    <property name="iconphoto">sanic.jpg</property>
+    <property name="iconphoto">telemetry-icon-vector.jpg</property>
     <property name="title" translatable="yes">Data Logger</property>
     <property name="width">200</property>
     <child>

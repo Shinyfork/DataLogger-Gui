@@ -13,6 +13,7 @@ import atexit
 import warnings
 import matplotlib.dates as mdates
 import csv
+import time
 
 FRAME_PROJECT_PATH = pathlib.Path(__file__).parent
 FRAME_PROJECT_UI = FRAME_PROJECT_PATH / "data_logger_frame.ui"
@@ -44,81 +45,25 @@ class DataLoggerFrameWidget(ttk.Frame):
         self.port_selected = False
         self.csv_file_path = None
         self.combobox = builder.get_object("ID_Combo_1", master)
-        self.canvas = builder.get_object("ID_Plot_1", master)
+        self.canvas_frame = builder.get_object("ID_Plot_1", master)
         self.update_interval = 500
         self.button_close_window = builder.get_object("ID_Button_Close_Window", master)
         self.button_close_window.bind("<Button-1>", lambda event: self.close_widget(event, self.frame))
         self.data_buffer = ""
-        self.plot_fig = plt.figure(figsize=(10, 2))
-        self.plot_axes = self.plot_fig.add_subplot(111)
-        self.plot_canvas = FigureCanvas(self.plot_fig, master=self.canvas)
-        self.axes = []
-        self.axes.append(self.plot_axes.twinx())
-        self.axes.append(self.plot_axes.twinx())
-        self.axes.append(self.plot_axes.twinx())
-        self.axes.append(self.plot_axes.twinx())
-        bg_color_name = self.cget('bg')
-        bg_rgb = self.winfo_rgb(bg_color_name)
-        bg_hex = f"#{int(bg_rgb[0] / 255):02X}{int(bg_rgb[1] / 255):02X}{int(bg_rgb[2] / 255):02X}"
-        self.plot_fig.patch.set_facecolor(bg_hex)
-        self.axes[0].set_ylim([0, 10])
-        self.axes[1].set_ylim([0, 10])
-        self.axes[2].set_ylim([80, 150])
-        self.axes[3].set_ylim([0, 10])
-        axes_linewidth = 0.5
-        self.axes[0].spines['top'].set_linewidth(axes_linewidth)
-        self.axes[0].spines['right'].set_linewidth(axes_linewidth)
-        self.axes[0].spines['bottom'].set_linewidth(axes_linewidth)
-        self.axes[0].spines['left'].set_linewidth(axes_linewidth)
-        self.axes[1].spines['top'].set_linewidth(axes_linewidth)
-        self.axes[1].spines['right'].set_linewidth(axes_linewidth)
-        self.axes[1].spines['bottom'].set_linewidth(axes_linewidth)
-        self.axes[1].spines['left'].set_linewidth(axes_linewidth)
-        self.axes[2].spines['top'].set_linewidth(axes_linewidth)
-        self.axes[2].spines['right'].set_linewidth(axes_linewidth)
-        self.axes[2].spines['bottom'].set_linewidth(axes_linewidth)
-        self.axes[2].spines['left'].set_linewidth(axes_linewidth)
-        self.axes[3].spines['top'].set_linewidth(axes_linewidth)
-        self.axes[3].spines['right'].set_linewidth(axes_linewidth)
-        self.axes[3].spines['bottom'].set_linewidth(axes_linewidth)
-        self.axes[3].spines['left'].set_linewidth(axes_linewidth)
-        self.axes[0].set_yticks([0, 2, 4, 6, 8, 10])
-        self.axes[1].set_yticks([0, 2, 4, 6, 8, 10])
-        self.axes[2].set_yticks([0, 30, 60, 90, 120, 150])
-        self.axes[3].set_yticks([0, 20, 40, 60, 80, 100])
-        self.axes[0].spines.right.set_position(("axes", 1.12))
-        self.axes[0].spines.right.set_color('green')
-        self.axes[1].spines.right.set_position(("axes", 1.24))
-        self.axes[1].spines.right.set_color('red')
-        self.axes[2].spines.right.set_position(("axes", 1.36))
-        self.axes[2].spines.right.set_color('orange')
-        self.axes[3].spines.right.set_position(("axes", 1.48))
-        self.axes[3].spines.right.set_color('blue')
-        self.axes[0].set_ylabel("Anzeigewert", color='green')
-        self.axes[1].set_ylabel("Druck", color='red')
-        self.axes[2].set_ylabel("Rohwert", color="orange")
-        self.axes[3].set_ylabel("Temperatur", color='blue')
-        self.axes[0].tick_params(axis='y', colors='green')
-        self.axes[1].tick_params(axis='y', colors='red')
-        self.axes[2].tick_params(axis='y', colors='orange')
-        self.axes[3].tick_params(axis='y', colors='blue')
-        self.axes[0].grid(True, which='major', linestyle='-')
-        #self.axes[0].grid(True, which='minor', linestyle='--')
-        # self.axes[0].minorticks_on()
-        # self.axes[1].minorticks_on()
-        # self.axes[2].minorticks_on()
-        # self.axes[3].minorticks_on()
-        self.plot_axes.get_yaxis().set_visible(False)
-        warnings.filterwarnings("ignore", message="The figure layout has changed to tight")
-        self.plot_fig.tight_layout()
-        self.plot_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH)
-        self.plot_canvas.draw()
+        self.canvas = tk.Canvas(self.canvas_frame, width=1000, height=500, bg="white")
+        self.canvas.pack()
+        self.x_axis = self.canvas.create_line(50, 550, 750, 550, fill="black", width=2)
+        self.y_axis = self.canvas.create_line(50, 50, 50, 550, fill="black", width=2)
+
+        self.points = []
+        self.x = 0
+
         self.populate_com_ports()
-        self.schedule_plot_update()
         self.schedule_serial_read()
         builder.connect_callbacks(self)
         self.df = pd.DataFrame(columns=["Timestamp", "Value1", "Value2", "Value5", "Value6"])  # Initialize df
         self.new_lines = []
+        self.frame.after(10, self.update) 
     def on_port_selected(self, event=None):
         self.serial_port = self.combobox.get()
         self.baud_rate = 115200
@@ -167,17 +112,6 @@ class DataLoggerFrameWidget(ttk.Frame):
             self.ser = None
         self.write_data = False
 
-    def plot_canvas(self):
-        self.plot_fig = plt.figure(figsize=(10, 5))
-
-
-
-
-        self.plot_axes = self.plot_fig.add_subplot(111)
-        self.plot_canvas = FigureCanvas(self.plot_fig, master=self.canvas)
-        self.plot_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.plot_canvas.draw()
-
     def change_serial_port(self, new_port):
         self.baud_rate = 115200
         self.serial_port = new_port
@@ -193,7 +127,8 @@ class DataLoggerFrameWidget(ttk.Frame):
                 }
 
     def schedule_plot_update(self):
-        self.after(self.update_interval, self.update_plot)
+        #self.after(self.update_interval, self.update_plot)
+        pass
     def schedule_serial_read(self):
         self.after(100, self.read_serial_port)
     def read_serial_port(self, event=None):
@@ -246,53 +181,27 @@ class DataLoggerFrameWidget(ttk.Frame):
         if self.csv_writer is not None:
             self.csv_writer.writerow(data_dict)
 
-    def update_plot(self, event=None):
+    
+    
+    def update(self):
+        x_max = 30*60
+        y_max = 10
+        x_min = 0
+        y_min = 0
         for data_dict in self.new_lines:
-            self.new_lines.remove(data_dict)
-            self.data_list.append(data_dict)
+            y = (data_dict["Value1"]-y_min)/y_max*self.canvas.winfo_height();            
+            self.x = self.x+1
+            if self.x > self.canvas.winfo_width():
+                self.x = 0
+            point = self.canvas.create_line(self.x, y, self.x+1, y, fill="red", width=1)
+            self.points.append(point)
+        self.new_lines = []
+            
+        while len(self.points) > 30*60:
+            self.canvas.delete(self.points[0])
+            self.points.pop(0)    
 
-        while len(self.data_list) > 86400:
-            self.data_list.pop(0)
-
-        if len(self.data_list) == 0:
-            self.schedule_plot_update()
-            return
-
-        self.df = pd.DataFrame(self.data_list)  # Update df with the new data
-
-        try:
-            self.plot1.remove()
-            self.plot2.remove()
-            self.plot3.remove()
-            self.plot4.remove()
-        except:
-            pass
-
-        # Update the plot using self.df
-        self.plot1 = self.axes[0].plot(self.df["Timestamp"], self.df["Value1"], label="Anzeigewert", color='green', linewidth=0.5)
-        self.plot2 = self.axes[1].plot(self.df["Timestamp"], self.df["Value5"], label="Druck", color='red', linewidth=0.5)
-        self.plot3 = self.axes[2].plot(self.df["Timestamp"], self.df["Value6"], label="Rohwert", color="orange", linewidth=0.5)
-        self.plot4 = self.axes[3].plot(self.df["Timestamp"], self.df["Value2"], label="Temperatur", color='blue', linewidth=0.5)
-
-        locs = [self.df["Timestamp"].iloc[0], self.df["Timestamp"].iloc[len(self.df) - 1]]
-        xtick_labels = [
-            self.df["Timestamp"].iloc[0].strftime("%d.%m.%Y %H:%M:%S"),
-            self.df["Timestamp"].iloc[len(self.df) - 1].strftime("%d.%m.%Y %H:%M:%S")
-        ]
-
-        self.axes[0].set_xticks(ticks=locs)
-        self.axes[0].set_xticklabels(labels=xtick_labels)
-        #self.plot_fig.tight_layout()
-        self.plot_canvas.draw()
-        self.schedule_plot_update()
-
-    def generate_display_text(self, df):
-        if len(df) > 0:
-            return "Time: " + str(df["Timestamp"].iloc[len(df) - 1]) + "\tValue2: " + str(
-                df["Value2"].iloc[len(df) - 1]) + "\t\tValue1: " + str(
-                df["Value1"].iloc[len(df) - 1]) + "\t\tValue5: " + str(
-                df["Value5"].iloc[len(df) - 1]) + "\t\tValue6: " + str(df["Value6"].iloc[len(df) - 1])
-
+        self.frame.after(10, self.update)
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -64,7 +64,7 @@
       </object>
     </child>
     <child>
-      <object class="ttk.Frame" id="frame13">
+      <object class="ttk.Frame" id="ID_Plot_1" named="True">
         <property name="height">200</property>
         <property name="width">200</property>
         <layout manager="pack">
@@ -73,15 +73,6 @@
           <property name="ipadx">5</property>
           <property name="side">right</property>
         </layout>
-        <child>
-          <object class="tk.Canvas" id="ID_Plot_1" named="True">
-            <layout manager="pack">
-              <property name="expand">true</property>
-              <property name="fill">x</property>
-              <property name="side">right</property>
-            </layout>
-          </object>
-        </child>
       </object>
     </child>
   </object>

@@ -3,7 +3,6 @@ import json
 import pathlib
 import tkinter as tk
 from tkinter import filedialog
-
 import pygubu
 
 import data_logger_frame
